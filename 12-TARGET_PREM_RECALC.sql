@@ -2,7 +2,7 @@
 spool 12-TARGET_PREM_RECALC.log
 whenever oserror exit commit;
 whenever sqlerror exit commit;
-set feedback on
+set feedback off
 set echo on
 set define off
 set sqlblanklines on

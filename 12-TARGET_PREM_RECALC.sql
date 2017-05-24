@@ -2,7 +2,6 @@
 spool 12-TARGET_PREM_RECALC.log
 whenever oserror exit commit;
 whenever sqlerror exit commit;
---guangjun add remark for testing
 set feedback on
 set echo on
 set define off

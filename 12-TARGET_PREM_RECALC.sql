@@ -31,7 +31,7 @@ update dc_module_run_time set begin_time=to_char(sysdate,'YYYY/MM/DD HH:MI:SS') 
 --comments:---create table table 
 --module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:1
 ------------calculate prem
-CREATE TABLE tsli_core_uat.DC_CONTRACT_PRODUCT (
+CREATE TABLE DC_CONTRACT_PRODUCT (
 	ITEM_ID            NUMBER(10),
 	POLICY_ID          NUMBER(10),
 	PRODUCT_ID         NUMBER(10),

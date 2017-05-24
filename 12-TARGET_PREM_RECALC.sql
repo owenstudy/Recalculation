@@ -81,10 +81,10 @@ CREATE TABLE DC_CONTRACT_PRODUCT (
 	refer_script       VARCHAR2(4000)
 );
 
-create or replace synonym DC_CONTRACT_PRODUCT for tsli_core_uat.DC_CONTRACT_PRODUCT ;
+create or replace synonym DC_CONTRACT_PRODUCT for DC_CONTRACT_PRODUCT ;
 --comments:----Generate the recalculated data from target table 
 --module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:2
-Insert into  tsli_core_uat.DC_CONTRACT_PRODUCT nologging (item_id,POLICY_ID,product_id,money_id,LIABILITY_STATE,master_id,
+Insert into  DC_CONTRACT_PRODUCT nologging (item_id,POLICY_ID,product_id,money_id,LIABILITY_STATE,master_id,
 STD_PREM_BF     ,
 STD_PREM_AF     ,
 GROSS_PREM_AF  , 
@@ -103,15 +103,15 @@ DISCNTED_PREM_BF,
 DISCNTED_PREM_AF,
 EXTRA_PREM_BF   ,
 EXTRA_PREM_AF   
- from tsli_core_uat.t_contract_product a,  tsli_core_uat.t_contract_master b
+ from t_contract_product a,  t_contract_master b
 where exists(select 1 from dm_contract_product b where a.policy_id=b.policy_id) and a.liability_state in(1,2) and product_id<>434
 and exists(select 1 from t_contract_extend where item_id=a.item_id and prem_status=1)
 and a.policy_id=b.policy_id;
 
-create  index is_contract_product_dc on tsli_core_uat.dc_contract_product(item_id) nologging;
+create  index is_contract_product_dc on dc_contract_product(item_id) nologging;
 --comments:--Create the recalculated function
 --module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:3
-create or replace function tsli_core_uat.f_calc_prem(v_item_id in number) RETURN varchar 
+create or replace function f_calc_prem(v_item_id in number) RETURN varchar 
  is
   v_due_date              date;
   v_derivation            char(1);
@@ -226,15 +226,15 @@ end;
 --comments:Run the recalculated procedure
 --module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:4
 --flag indicating log calculating process or not
-update tsli_core_uat.t_para_def set single_para_value= '0' where para_id = 1000164001;
+update t_para_def set single_para_value= '0' where para_id = 1000164001;
 
 declare
-  cursor c_product is select item_id,liability_state from tsli_core_uat.DC_CONTRACT_PRODUCT where PROCESSED='N' ;
+  cursor c_product is select item_id,liability_state from DC_CONTRACT_PRODUCT where PROCESSED='N' ;
 v_error varchar2(4000);
 begin
-tsli_core_uat.pkg_pub_app_context.P_SET_APP_USER_ID(401);
+pkg_pub_app_context.P_SET_APP_USER_ID(401);
   for v_product in c_product loop
-        v_error:=tsli_core_uat.f_calc_prem(v_product.item_id);
+        v_error:=f_calc_prem(v_product.item_id);
         exit when instr(v_error,'maximum open cursors exceededstack trace')>0;
   end loop;
   exception when others then
@@ -244,8 +244,8 @@ end;
 /
 --comments:--restore the parameter and analyze table
 --module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:5
-update tsli_core_uat.t_para_def set single_para_value= '1' where para_id = 1000164001;
-analyze table tsli_core_uat.dc_contract_product compute statistics;
+update t_para_def set single_para_value= '1' where para_id = 1000164001;
+analyze table dc_contract_product compute statistics;
 
 ---Update the unpassed records.
 update dc_contract_product a set a.passed='N' where a.error_msg is not null;

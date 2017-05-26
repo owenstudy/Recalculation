@@ -4,7 +4,7 @@ whenever oserror exit commit;
 whenever sqlerror exit commit;
 set feedback on  --conflict
 set echo on
-set define off
+set define on
 set sqlblanklines on
 select to_char(sysdate,'YYYY/MM/DD HH:MI:SS') from dual;
 insert into dc_module_run_time(pro_id,module_name) values(2,'TARGET_PREM_RECALC');

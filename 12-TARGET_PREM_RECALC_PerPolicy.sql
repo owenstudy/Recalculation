@@ -1,7 +1,7 @@
 ----运行时直接@这个文件名称即可
 ----在command窗口     @d:\12-TARGET_PREM_RECALC_PerPolicy.sql   然后输入policy_id即可对该保单进行重算
 ----更新要计算的保单号
- 
+
 update DC_CONTRACT_PRODUCT a set a.PROCESSED='N'，error_msg=null where policy_id=&policy_id;
 
 declare

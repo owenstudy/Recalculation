@@ -1,5 +1,6 @@
 # Recalculation
 #保费重算
+
 ---计算全部数据的保费
 12-TARGET_PREM_RECALC.sql
 ---保单级别的保费重算
@@ -11,10 +12,11 @@
 优化程序内容，一个批处理可以跑完全部的重算
 增加对单个保单进行重算的接口
 
-
 #CV重算
+
 --CV脚本
 需要在转换之前初始化好源系统的CV值在表dc_legacy_cashvalue中
+
   policy_id number(10), 
   item_id number(10), 
   policy_no varchar2(20),

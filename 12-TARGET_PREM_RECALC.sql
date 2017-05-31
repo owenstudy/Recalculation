@@ -7,29 +7,9 @@ set echo on
 set define off  --nothing to change
 set sqlblanklines on
 select to_char(sysdate,'YYYY/MM/DD HH:MI:SS') from dual;
-insert into dc_module_run_time(pro_id,module_name) values(2,'TARGET_PREM_RECALC');
-update dc_module_run_time set begin_time=to_char(sysdate,'YYYY/MM/DD HH:MI:SS')  where pro_id=2 and module_name='TARGET_PREM_RECALC';
-/*=======================================================================Begin module level  section */
-/*=======================================================================End   module level  section */
 
-/*=======================================================================Begin table initial script  section */
-/*=======================================================================End   table initial script  section */
-
-/*=======================================================================Begin table check error script  section */
-/*=======================================================================End   table check error script  section */
-
-/*=======================================================================Begin table level: T_CONTRACT_PRODUCT(1)  before insert section */
-/*=======================================================================End   table level: T_CONTRACT_PRODUCT(1)  before insert section */
-
-/*=======================================================================Begin column level: T_CONTRACT_PRODUCT(1)  before insert section */
-/*=======================================================================End   column level: T_CONTRACT_PRODUCT(1)  before insert section */
-
-/*=======================================================================Begin column level: T_CONTRACT_PRODUCT(1)  after insert section */
-/*=======================================================================End   column level: T_CONTRACT_PRODUCT(1)  after insert section */
-
-/*=======================================================================Begin table level: T_CONTRACT_PRODUCT(1)  after insert section */
+drop table DC_CONTRACT_PRODUCT; 
 --comments:---create table table 
---module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:1
 ------------calculate prem
 CREATE TABLE DC_CONTRACT_PRODUCT (
 	ITEM_ID            NUMBER(10),
@@ -81,7 +61,6 @@ CREATE TABLE DC_CONTRACT_PRODUCT (
 	refer_script       VARCHAR2(4000)
 );
 
-create or replace synonym DC_CONTRACT_PRODUCT for DC_CONTRACT_PRODUCT ;
 --comments:----Generate the recalculated data from target table 
 --module name:TARGET_PREM_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:2
 Insert into  DC_CONTRACT_PRODUCT nologging (item_id,POLICY_ID,product_id,money_id,LIABILITY_STATE,master_id,
@@ -104,7 +83,7 @@ DISCNTED_PREM_AF,
 EXTRA_PREM_BF   ,
 EXTRA_PREM_AF   
  from t_contract_product a,  t_contract_master b
-where exists(select 1 from dm_contract_product b where a.policy_id=b.policy_id) and a.liability_state in(1,2) and product_id<>434
+where a.derivation=2 and a.liability_state in(1,2) and product_id not in (434)
 and exists(select 1 from t_contract_extend where item_id=a.item_id and prem_status=1)
 and a.policy_id=b.policy_id;
 
@@ -260,7 +239,7 @@ update dc_contract_product a set a.passed='N' where
     or abs(a.extra_prem_bf - a.o_extra_prem_bf) > decode(a.money_id,4,1,8,5)
     or abs(a.extra_prem_af - a.o_extra_prem_af) > decode(a.money_id,4,1,8,5)
 )
- and exists(select 1 from dm_contract_product bb where a.policy_id=bb.policy_id)
+ and derivation=2
  and a.product_id<>434 and a.liability_state<>3;
 commit;
 --comments:--check the recalculated result
@@ -287,6 +266,5 @@ commit;
 
 ---------------------------------------------The end-----------------------------------
 select to_char(sysdate,'YYYY/MM/DD HH:MI:SS') from dual;
-update dc_module_run_time set end_time=to_char(sysdate,'YYYY/MM/DD HH24:MI:SS')  where pro_id=2 and module_name='TARGET_PREM_RECALC';
 commit;
 spool off

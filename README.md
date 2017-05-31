@@ -1,5 +1,5 @@
 # Recalculation
-#保费重算
+# 保费重算
 
 ---计算全部数据的保费
 12-TARGET_PREM_RECALC.sql
@@ -12,7 +12,7 @@
 优化程序内容，一个批处理可以跑完全部的重算
 增加对单个保单进行重算的接口
 
-#CV重算
+# CV重算
 
 --CV脚本
 需要在转换之前初始化好源系统的CV值在表dc_legacy_cashvalue中

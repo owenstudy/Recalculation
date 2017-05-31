@@ -1,18 +1,12 @@
 ﻿whenever sqlerror exit commit;-----end
 set timing on;
 spool 13-TARGET_CASH_VAlUE_RECALC.log
-whenever oserror exit commit;
-whenever sqlerror exit commit;
-set feedback on
-set echo on
-set define off
-set sqlblanklines on
 select to_char(sysdate,'YYYY/MM/DD HH:MI:SS') from dual;
 --comments:Create the table to keep the recalculated value
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------cash value calculation
-drop table DC_CONTRACT_PRODUCT_CASHVALUE; 
 whenever sqlerror continue commit;-----begin
+drop table DC_CONTRACT_PRODUCT_CASHVALUE; 
 CREATE table DC_CONTRACT_PRODUCT_CASHVALUE (
          ITEM_ID                   NUMBER(10),
          POLICY_ID                 NUMBER(10),
@@ -50,7 +44,6 @@ CREATE table DC_CONTRACT_PRODUCT_CASHVALUE (
          refer_script    VARCHAR2(4000),
          prem_status   char(1)
 );
-create or replace synonym DC_CONTRACT_PRODUCT_CASHVALUE for DC_CONTRACT_PRODUCT_CASHVALUE ;
 --comments:Generte the recalculated data
 --module name:TARGET_CASH_VAlUE_RECALC,table name:T_CONTRACT_PRODUCT,table sequence:1,--script seq:2
 whenever sqlerror exit commit;-----end
@@ -67,7 +60,7 @@ a.ITEM_ID              ,
 a.POLICY_ID            ,     
 PRODUCT_ID           ,     
 LIABILITY_STATE      ,       
-to_date(&CV_Recalc_Date(yyyy/mm/dd),'YYYY/MM/DD'),
+to_date(&CV_Recalc_Date_yyyy_mm_dd,'YYYY/MM/DD'),
 'N'                       ,
 AMOUNT                                  
 from t_contract_product a,t_contract_extend b
@@ -137,37 +130,26 @@ commit;
 whenever sqlerror continue commit;-----begin
 alter table dc_contract_product_cashvalue add(prod_cd varchar2(100));
 whenever sqlerror exit commit;-----end
+/*
 merge into dc_contract_product_cashvalue a  using 
  dc_gtis_nb_cont_prod  b
 on (a.item_id=b.dc_item_id) 
   when matched then 
     update set a.prod_cd=b.prod_cd;
 commit;
+*/
 
 whenever sqlerror continue commit;-----begin
 --这个表需要在重算之前处理好
 drop table dc_legacy_cashvalue; 
 create table dc_legacy_cashvalue (
-  policy_id, 
-  item_id, 
-  policy_no,
-  old_cashvalue, 
-  cashvalue_date ,
-  prod_cd
+  policy_id number(10), 
+  item_id number(10), 
+  policy_no varchar2(20),
+  old_cashvalue number(12,2), 
+  cashvalue_date date,
+  prod_cd varchar2(10)
   );
-/*
- as 
-select 
-distinct 
-b.policy_id,
-b.item_id,
-a.POLICY_NO,
-a.CV_AMT,
-a.CV_DATE ,
-a.prod_cd
-from dc_contract_product_cashvalue b,GTIS_MT_CASH_VALUE a where a.policy_no=b.policy_no
-and a.prod_cd=b.prod_cd;
-*/
 
 create index dc_cashvalue_item_id on dc_contract_product_cashvalue(item_id);
 create index dc_cashvalue_prod_cd on dc_contract_product_cashvalue(prod_cd);
@@ -176,13 +158,12 @@ create index dc_cash_prod_cd on dc_legacy_cashvalue(prod_cd);
 alter table dc_contract_product_cashvalue add(old_cashvalue NUMBER(18,2));
 whenever sqlerror exit commit;-----end
 update  dc_contract_product_cashvalue a  set a.old_cashvalue=
-(select distinct b.old_cashvalue from dc_legacy_cashvalue b where b.prod_cd=a.prod_cd and a.item_id=b.item_id);
+(select distinct b.old_cashvalue from dc_legacy_cashvalue b where /*b.prod_cd=a.prod_cd and*/ a.item_id=b.item_id);
 commit;
 update dc_contract_product_cashvalue a set a.passed='N' where a.error_msg is not null;
 commit;
 update dc_contract_product_cashvalue a set a.passed='N' where 
       ABS(a.o_value - a.old_cashvalue ) >5  
- and exists(select 1 from dm_contract_product bb where a.policy_id=bb.policy_id)
  and a.product_id<>434 and a.liability_state<>3;
 commit;
 

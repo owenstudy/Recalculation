@@ -3,7 +3,9 @@
 
 ### 保费重算脚本文件说明
 ####
-		计算全部数据的保费
+		初始化重算数据，第一次运行时或者需要全部进行重新计算时需要运行这个脚本
+		12-TARGET_PREM_RECALC_InitialData.sql
+		重算不通过的保单记录，可以重复多次运行
 		12-TARGET_PREM_RECALC.sql
 		保单级别的保费重算
 		12-TARGET_PREM_RECALC_PerPolicy.sql

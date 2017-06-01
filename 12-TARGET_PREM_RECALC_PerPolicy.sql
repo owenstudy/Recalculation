@@ -28,15 +28,14 @@ update dc_contract_product a set a.passed='N' where a.error_msg is not null;
 
 ---定义通过的标准
 update dc_contract_product a set a.passed='N' where 
-      (ABS(a.std_prem_bf   -  a.o_std_prem_bf ) >decode(a.money_id,4,1,8,5)
-    or abs(a.std_prem_af    -  a.o_std_prem_af) > decode(a.money_id,4,1,8,5)
-    or abs(a.gross_prem_af - a.o_gross_prem_af) > decode(a.money_id,4,1,8,5)
-    or abs(a.total_prem_af  - a.o_total_prem_af) > decode(a.money_id,4,1,8,5)
-    or abs(a.discnted_prem_bf - a.o_discnted_prem_bf) > decode(a.money_id,4,1,8,5)
-    or abs(a.discnted_prem_af - a.o_discnted_prem_af) > decode(a.money_id,4,1,8,5)
-    or abs(a.extra_prem_bf - a.o_extra_prem_bf) > decode(a.money_id,4,1,8,5)
-    or abs(a.extra_prem_af - a.o_extra_prem_af) > decode(a.money_id,4,1,8,5)
+      (ABS(a.std_prem_bf   -  a.o_std_prem_bf ) >decode(a.money_id,4,1,21,5)
+    or abs(a.std_prem_af    -  a.o_std_prem_af) > decode(a.money_id,4,1,21,5)
+    or abs(a.gross_prem_af - a.o_gross_prem_af) > decode(a.money_id,4,1,21,5)
+    or abs(a.total_prem_af  - a.o_total_prem_af) > decode(a.money_id,4,1,21,5)
+    or abs(a.discnted_prem_bf - a.o_discnted_prem_bf) > decode(a.money_id,4,1,21,5)
+    or abs(a.discnted_prem_af - a.o_discnted_prem_af) > decode(a.money_id,4,1,21,5)
+    or abs(a.extra_prem_bf - a.o_extra_prem_bf) > decode(a.money_id,4,1,21,5)
+    or abs(a.extra_prem_af - a.o_extra_prem_af) > decode(a.money_id,4,1,21,5)
 )
- and derivation=2
- and a.product_id<>434 and a.liability_state<>3;
+ and  a.liability_state<>3;
 commit;
